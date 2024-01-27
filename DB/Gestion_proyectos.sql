@@ -2,18 +2,24 @@ CREATE DATABASE gestion_proyectos;
 
 USE gestion_proyectos;
 
+-- SET FOREIGN_KEY_CHECKS = 0;
+-- SET FOREIGN_KEY_CHECKS = 1;
+
 CREATE TABLE usuarios(
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50),
     apellido VARCHAR(50),
     email VARCHAR(50),
     contraseña VARCHAR(50),
+    equipo_id INT,
     pregunta_seguridad VARCHAR(50),
     respuesta_seguridad VARCHAR(50),
     token VARCHAR(10),
     rol_id INT,
-    FOREIGN KEY (rol_id) REFERENCES roles(id)
+    FOREIGN KEY (rol_id) REFERENCES roles(id),
+	FOREIGN KEY (equipo_id) REFERENCES equipos(id)
 );
+
 
 CREATE TABLE roles(
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -21,20 +27,13 @@ CREATE TABLE roles(
     permisos JSON
 );
 
+select * from equipos;
 CREATE TABLE equipos(
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50),
     descripcion VARCHAR(50),
-    usuario_id INT,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-);
-
-CREATE TABLE equipos_miembros(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    equipo_id INT,
-    usuario_id INT,
-    FOREIGN KEY (equipo_id) REFERENCES equipos(id),
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    proyecto_id INT,
+    FOREIGN KEY(proyecto_id) REFERENCES proyectos(id)
 );
 
 CREATE TABLE proyectos(
@@ -43,16 +42,8 @@ CREATE TABLE proyectos(
     descripcion VARCHAR(50),
     fecha_inicio DATE,
     fecha_fin DATE,
-    estado ENUM('En proceso', 'Terminado', 'Suspendido'),
-    equipo_id INT,
-    FOREIGN KEY (equipo_id) REFERENCES equipos(id)
+    estado ENUM('En proceso', 'Terminado', 'Suspendido')
 );
-
--- DROP TABLE estados;
--- CREATE TABLE estados(
-    -- id INT AUTO_INCREMENT PRIMARY KEY,
-    -- nombre VARCHAR(50)
--- );
 
 CREATE TABLE proyectos_equipos(
     id INT AUTO_INCREMENT PRIMARY KEY,
