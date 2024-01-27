@@ -1,0 +1,35 @@
+# Archivos de sistema
+.DS_Store
+
+# Carpetas generadas por el sistema de archivos
+node_modules/
+dist/
+
+# Archivos de configuración
+.env
+
+# Logs y archivos temporales
+logs/
+*.log
+npm-debug.log*
+
+# Directorio de construcción
+build/
+
+# Dependencias específicas de tu proyecto
+# (Ejemplos para algunos marcos y entornos comunes)
+# Si estás utilizando React.js
+*.iml
+*.log
+*.pot
+*.pyc
+*.swp
+*.db
+*.sqlite
+*.sqlite3
+*.pdf
+*.jpg
+*.png
+*.gif
+*.jpeg
+Thumbs.db
