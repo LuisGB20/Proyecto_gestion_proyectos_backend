@@ -45,13 +45,6 @@ CREATE TABLE proyectos(
     estado ENUM('En proceso', 'Terminado', 'Suspendido')
 );
 
-CREATE TABLE proyectos_equipos(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    proyecto_id INT,
-    equipo_id INT,
-    FOREIGN KEY (proyecto_id) REFERENCES proyectos(id),
-    FOREIGN KEY (equipo_id) REFERENCES equipos(id)
-);
 
 CREATE TABLE mensajes(
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -85,7 +78,7 @@ CREATE TABLE solicitudes(
     miembro_id INT,
     proyecto_id INT,
     recurso_id INT,
-    FOREIGN KEY (miembro_id) REFERENCES equipos_miembros(id),
+    FOREIGN KEY (miembro_id) REFERENCES usuarios(id),
     FOREIGN KEY (proyecto_id) REFERENCES proyectos(id),
     FOREIGN KEY (recurso_id) REFERENCES recursos(id)
 );
@@ -97,8 +90,20 @@ CREATE TABLE evaluaciones_recursos(
     miembro_id INT,
     proyecto_id INT,
     solicitud_id INT,
-    FOREIGN KEY (miembro_id) REFERENCES equipos_miembros(id),
+    FOREIGN KEY (miembro_id) REFERENCES usuarios(id),
     FOREIGN KEY (proyecto_id) REFERENCES proyectos(id),
     FOREIGN KEY (solicitud_id) REFERENCES solicitudes(id)
 );
     
+CREATE TABLE tareas(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50),
+    descripcion VARCHAR(50),
+    fecha_inicio DATE,
+    fecha_fin DATE,
+    estado ENUM('En proceso', 'Terminado', 'Suspendido')
+    usuario_id INT,
+    proyecto_id INT,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    FOREIGN KEY (proyecto_id) REFERENCES proyectos(id),
+);
