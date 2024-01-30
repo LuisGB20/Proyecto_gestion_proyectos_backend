@@ -101,4 +101,15 @@ CREATE TABLE evaluaciones_recursos(
     FOREIGN KEY (proyecto_id) REFERENCES proyectos(id),
     FOREIGN KEY (solicitud_id) REFERENCES solicitudes(id)
 );
-    
+
+CREATE TABLE tareas (
+    id INT  NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+    titulo VARCHAR(100) NOT NULL,
+    estatus  ENUM ('Pendiente','En progreso','Finalizada') DEFAULT 'Pendiente',
+    fecha_inicio DATETIME,
+    fecha_finalizacion DATETIME,
+    responsable_id INT,
+    proyecto_id INT,
+    FOREIGN KEY (responsable_id) REFERENCES usuarios(id),
+    FOREIGN KEY (proyecto_id) REFERENCES proyectos(id)
+)
