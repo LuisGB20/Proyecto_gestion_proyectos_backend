@@ -1,4 +1,6 @@
 import express from 'express';
+import fs from 'fs';
+import https from 'https';
 import cors from 'cors';
 import { puerto } from './config.js';
 import indexRoutes from './routes/index.routes.js';
@@ -27,6 +29,14 @@ app.use(recursosRoutes);
 app.use(solicitudesRoutes);
 app.use(tareasRoutes);
 
-app.listen(puerto, () => {
+const opcionesHTTPS = {
+    key: fs.readFileSync('C:/Windows/System32/cert.key'),
+    cert: fs.readFileSync('C:/Windows/System32/cert.crt'),
+};
+
+const servidorHTTPS = https.createServer(opcionesHTTPS, app);
+
+
+servidorHTTPS.listen(puerto, () => {
     console.log(`Servidor escuchando en puerto ${puerto}`);
 })

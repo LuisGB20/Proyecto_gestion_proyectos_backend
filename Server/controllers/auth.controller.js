@@ -19,7 +19,7 @@ const enviarCorreo = async (correo, codigo) => {
         auth: {
             user: 'infodreamx2023@gmail.com',
             pass: 'acyoatlvlxgwfoxx',
-        },
+        }
     });
 
   // Configuración del mensaje de correo electrónico
@@ -52,15 +52,15 @@ export const register = async (req, res) => {
     try {
         const [rows2] = await pool.query("SELECT * FROM usuarios WHERE email = ?", [email]);
         if (rows2.length === 0) {
-            const contraseñaHasheada = hashearContra(contrasena)
-            console.log(contraseñaHasheada)
-            const [rows] = await pool.query("INSERT INTO usuarios (nombre, apellido, email, contraseña, pregunta_seguridad, respuesta_seguridad, rol_id) VALUES (?, ?, ?, ?, ?, ?, ?)", [nombre, apellido, email, contraseñaHasheada, pregunta_seguridad, respuesta_seguridad, rol_id]);
+            const contrasenaHasheada = hashearContra(contrasena)
+            console.log(contrasenaHasheada)
+            const [rows] = await pool.query("INSERT INTO usuarios (nombre, apellido, email, contraseña, pregunta_seguridad, respuesta_seguridad, rol_id) VALUES (?, ?, ?, ?, ?, ?, ?)", [nombre, apellido, email, contrasenaHasheada, pregunta_seguridad, respuesta_seguridad, rol_id]);
             res.json({
                 id: rows.insertId,
                 nombre,
                 apellido,
                 email,
-                contraseñaHasheada,
+                contrasenaHasheada,
                 pregunta_seguridad,
                 respuesta_seguridad,
                 rol_id
@@ -87,8 +87,7 @@ export const login = async (req, res) => {
         const usuario = rows[0];
         const comparacionContra = compararPassword(contrasena, usuario.contraseña)
         if (comparacionContra) {
-            const token = jwt.sign({ id: usuario.id }, "secretkey");
-            return res.json({ token });
+            return res.json(usuario);
         } else {
             return res.status(401).json({ message: "Contraseña incorrecta" });
         }
@@ -102,23 +101,27 @@ export const login = async (req, res) => {
 export const verificarCorreo = async (req, res) => {
     const codigo = generarCodigoVerificacion();
     const { email } = req.body;
+    console.log(email)
     try {
         const [rows] = await pool.query("SELECT * FROM usuarios WHERE email = ?", [email]);
         if (rows.length === 0) {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
         const usuario = rows[0];
+    console.log("Aqui muere")
         await enviarCorreo(email, codigo);
         const actualizarToken = await pool.query("UPDATE usuarios SET token = ? WHERE id = ?", [codigo, usuario.id]);
         console.log(actualizarToken)
         return res.json({ message: "Correo enviado" });
     }
     catch (error) {
+        console.log("Esta aqui el error")
         return res.status(500).json({ message: error.message });
     }
 }
 
 export const vericarCodigo = async (req, res) => {
+    console.log(req.body)
     const { codigo } = req.body;
     console.log(codigo)
     try {
@@ -135,9 +138,10 @@ export const vericarCodigo = async (req, res) => {
     }
 }
 
-
 // Verificar pregunta de seguridad
 export const verificarPregunta = async (req, res) => {
+    console.log("Checando pregunta")
+    console.log(req.body)
     const { email, pregunta_seguridad, respuesta_seguridad } = req.body;
     try {
         const [rows] = await pool.query("SELECT * FROM usuarios WHERE email = ?", [email]);
@@ -145,12 +149,32 @@ export const verificarPregunta = async (req, res) => {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
         const usuario = rows[0];
+        // Obtener roles
+        const [roles] = await pool.query("SELECT roles.nombre FROM usuarios INNER JOIN roles ON usuarios.rol_id = roles.id WHERE usuarios.id = ?", [usuario.id]);
+        console.log(roles[0].nombre)
         if (usuario.pregunta_seguridad === pregunta_seguridad && usuario.respuesta_seguridad === respuesta_seguridad) {
-            const token = jwt.sign({ id: usuario.id }, "secretkey");
+            const tokenPayload = { id: usuario.id, roles: roles[0].nombre };
+            const token = jwt.sign(tokenPayload, "secretkey");
             return res.json({ token });
         } else {
             return res.status(401).json({ message: "Pregunta de seguridad incorrecta" });
         }
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+ }
+
+ export const agregarPreguntaYRespuesta = async (req, res) => {
+    const { email, pregunta_seguridad, respuesta_seguridad } = req.body;
+    console.log(req.body)
+    try {
+        const [rows] = await pool.query("SELECT * FROM usuarios WHERE email = ?", [email]);
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+        const usuario = rows[0];
+        const actualizarPregunta = await pool.query("UPDATE usuarios SET pregunta_seguridad = ?, respuesta_seguridad = ? WHERE id = ?", [pregunta_seguridad, respuesta_seguridad, usuario.id]);
+        return res.json({ message: "Pregunta y respuesta agregadas" });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
