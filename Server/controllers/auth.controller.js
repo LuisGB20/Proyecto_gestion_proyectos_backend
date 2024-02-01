@@ -39,7 +39,6 @@ const enviarCorreo = async (correo, codigo) => {
   try {
     // Enviar el correo
     const info = await transporter.sendMail(mensaje);
-    console.log(info);
   } catch (error) {
     console.error('Error al enviar el correo:', error);
   }
@@ -55,6 +54,7 @@ export const register = async (req, res) => {
             const contrasenaHasheada = hashearContra(contrasena)
             console.log(contrasenaHasheada)
             const [rows] = await pool.query("INSERT INTO usuarios (nombre, apellido, email, contraseña, pregunta_seguridad, respuesta_seguridad, rol_id) VALUES (?, ?, ?, ?, ?, ?, ?)", [nombre, apellido, email, contrasenaHasheada, pregunta_seguridad, respuesta_seguridad, rol_id]);
+
             res.json({
                 id: rows.insertId,
                 nombre,
@@ -85,7 +85,10 @@ export const login = async (req, res) => {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
         const usuario = rows[0];
-        const comparacionContra = compararPassword(contrasena, usuario.contraseña)
+        // const contrasenaHasheada = hashearContra(contrasena)
+        // console.log(contrasenaHasheada)
+        // console.log(usuario.contraseña)
+        const comparacionContra = compararPassword(contrasena, usuario.contraseña)        // const comparacionContra = compararPassword(contrasena, usuario.contraseña)
         if (comparacionContra) {
             return res.json(usuario);
         } else {

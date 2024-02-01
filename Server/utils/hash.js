@@ -6,6 +6,7 @@ export const hashearContra = (password) => {
 }
 
 export const compararPassword = (password, hash) => {
-    console.log(password, hash);
+    console.log(password);
+    console.log(hash);
     return bcrypt.compareSync(password, hash);
 }
