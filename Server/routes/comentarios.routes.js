@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 router.post('/comentarios', agregarComentario)
-router.get('/comentarios', obtenerComentarios)
+router.get('/comentarios/:equipo_id', obtenerComentarios)
 router.get('/comentarios/:id', obtenerComentario)
 router.put('/comentarios/:id', editarComentario)
 router.delete('/comentarios/:id', eliminarComentario)

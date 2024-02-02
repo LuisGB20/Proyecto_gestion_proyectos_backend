@@ -2,6 +2,7 @@ import { pool } from '../db.js'
 
 export const agregarRecurso = async (req, res) => {
     const { nombre, descripcion, disponibilidad, tipo, categoria } = req.body;
+    console.log(req.body);
     try {
         const [results] = await pool.query('INSERT INTO recursos (nombre, descripcion, disponibilidad, tipo, categoria_id) VALUES (?, ?, ?, ?, ?)', [nombre, descripcion, disponibilidad, tipo, categoria]);
         if (results.affectedRows <= 0) {
@@ -24,7 +25,7 @@ export const obtenerRecursos = async (req, res) => {
     try {
         const [results] = await pool.query('SELECT * FROM recursos');
         if (results.length > 0) {
-            res.json(results[0]);
+            res.json(results);
         } else {
             res.status(404).json({ message: 'recurso no encontrado' });
         }

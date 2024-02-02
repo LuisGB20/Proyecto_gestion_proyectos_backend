@@ -1,13 +1,16 @@
 import { pool } from '../db.js'
 
 export const agregarSolicitud = async (req, res) => {
-    const { miembro, proyecto, recurso } = req.body;
+    const { miembro, equipo, recurso } = req.body;
     const fecha = new Date();
     const año = fecha.getFullYear();
     const mes = fecha.getMonth() + 1;
     const dia = fecha.getDate();
     const fechaFormateada = año + '-' + mes + '-' + dia;
     try {
+        const [respuesta] = await pool.query('SELECT * FROM equipos WHERE id = ?', [equipo])
+        const proyecto = respuesta[0].proyecto_id;
+         console.log(respuesta)
         const [rows] = await pool.query('INSERT INTO solicitudes (fecha_solicitud, miembro_id, proyecto_id, recurso_id) VALUES (?, ?, ?, ?)', [fechaFormateada, miembro, proyecto, recurso]);
         res.json({
             id: rows.insertId,
