@@ -24,7 +24,16 @@ export const agregarUsuario = async (req, res) => {
 
 export const obtenerUsuarios = async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM usuarios')
+        const [rows] = await pool.query('SELECT usuarios.id, usuarios.nombre, usuarios.apellido, roles.nombre as rol, equipos.nombre as equipo FROM usuarios INNER JOIN roles ON usuarios.rol_id = roles.id LEFT JOIN equipos ON usuarios.equipo_id = equipos.id;')
+        return res.json(rows)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const obtenerUsuariosNoJefes = async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT * FROM usuarios WHERE rol_id <> 1;')
         return res.json(rows)
     } catch (error) {
         console.log(error)
@@ -33,7 +42,7 @@ export const obtenerUsuarios = async (req, res) => {
 
 export const obtenerUsuario = async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM usuarios WHERE id = ?', [req.params.id])
+        const [rows] = await pool.query('SELECT usuarios.id, usuarios.nombre, usuarios.apellido, usuarios.email, roles.nombre as rol, equipos.nombre as equipo FROM usuarios INNER JOIN roles ON usuarios.rol_id = roles.id LEFT JOIN equipos ON usuarios.equipo_id = equipos.id WHERE usuarios.id = ?', [req.params.id])
         return res.json(rows[0])
     } catch (error) {
         console.log(error)
@@ -41,26 +50,33 @@ export const obtenerUsuario = async (req, res) => {
 }
 
 export const actualizarUsuario = async (req, res) => {
-    const { nombre, apellido, email, contrasena, equipo, pregunta_seguridad, respuesta_seguridad, rol_id } = req.body
-    //Consulta contraseña usuario
-    const [rows] = await pool.query('SELECT * FROM usuarios WHERE id = ?', [req.params.id])
-    const contrasenaUsuario = rows[0].contraseña;
-    console.log(contrasenaUsuario)
-    //verificamos si cambio la contraseña
-    const cambioContrasena = compararPassword(contrasena, contrasenaUsuario)
-        ? contrasenaUsuario : hashearContra(contrasena);  //si no cambio la contraseña, la hasheamos y la guardamos en la base de datos
-    console.log(cambioContrasena)
+    const { nombre, apellido, email, contrasena, equipo, rol } = req.body
+    console.log(req.body)
+
+    //Obtener roles
+    const [roles] = await pool.query('SELECT * FROM roles WHERE nombre = ?', [rol])
+    const rol_id = roles[0].id;
+
+    // Obtener equipos 
+    const [equipos] = await pool.query('SELECT * FROM equipos WHERE nombre = ?', [equipo])
+    const equipo_id = equipos[0].id;
+
+    // //Consulta contraseña usuario
+    // const [rows] = await pool.query('SELECT * FROM usuarios WHERE id = ?', [req.params.id])
+    // const contrasenaUsuario = rows[0].contraseña;
+    // console.log(contrasenaUsuario)
+    // //verificamos si cambio la contraseña
+    // const cambioContrasena = compararPassword(contrasena, contrasenaUsuario)
+    //     ? contrasenaUsuario : hashearContra(contrasena);  //si no cambio la contraseña, la hasheamos y la guardamos en la base de datos
+    // console.log(cambioContrasena)
     try {
-        const [rows] = await pool.query('UPDATE usuarios SET nombre = ?, apellido = ?, email = ?, contraseña = ?, equipo_id = ?, pregunta_seguridad = ?, respuesta_seguridad = ?, rol_id = ? WHERE id = ?', [nombre, apellido, email, cambioContrasena, equipo, pregunta_seguridad, respuesta_seguridad, rol_id, req.params.id])
+        const [rows] = await pool.query('UPDATE usuarios SET nombre = ?, apellido = ?, email = ?, equipo_id = ?, rol_id = ? WHERE id = ?', [nombre, apellido, email, equipo_id, rol_id, req.params.id])
         return res.json({
             id: req.params.id,
             nombre,
             apellido,
             email,
-            equipo,
-            cambioContrasena,
-            pregunta_seguridad,
-            respuesta_seguridad,
+            equipo_id,
             rol_id
         }) 
     } catch (error) {
