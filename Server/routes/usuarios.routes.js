@@ -5,7 +5,8 @@ import {
     agregarUsuario,
     actualizarUsuario,
     eliminarUsuario,
-    obtenerUsuariosNoJefes
+    obtenerUsuariosNoJefes,
+    obtenerUsuariosEquipo
 } from '../controllers/usuarios.controller.js'
 
 const router = Router();
@@ -13,6 +14,7 @@ const router = Router();
 router.get("/usuarios", obtenerUsuarios)
 router.get("/usuarios/:id", obtenerUsuario)
 router.get("/usuariosnojefes", obtenerUsuariosNoJefes)
+router.get("/usuariosEquipos/:equipo", obtenerUsuariosEquipo)
 router.post("/usuarios", agregarUsuario)
 router.put("/usuarios/:id", actualizarUsuario)
 router.delete("/usuarios/:id", eliminarUsuario)

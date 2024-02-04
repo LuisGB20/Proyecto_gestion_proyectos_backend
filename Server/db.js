@@ -5,5 +5,6 @@ export const pool = createPool({
     user: 'root',
     password: 'root',
     port: 3306,
-    database: 'gestion_proyectos'
+    database: 'gestion_proyectos',
+    ssl: {rejectUnauthorized: false}
 })

@@ -39,9 +39,18 @@ export const obtenerEquipos = async (req, res) => {
     }
 }
 
+export const obtenerEquiposProyecto = async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT equipos.id, equipos.nombre AS nombreEquipo, equipos.descripcion as equipoDescripcion, proyectos.nombre as nombreproyecto, proyectos.fecha_inicio as fechaComienzo FROM equipos INNER JOIN proyectos ON equipos.proyecto_id = proyectos.id WHERE proyectos.id = ?;', [req.params.proyecto]);
+        res.json(rows);
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 export const obtenerEquipo = async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT equipos.id as idEquipo, equipos.nombre as equipoNombre, equipos.descripcion as equipoDescripcion, proyectos.nombre as proyectoNombre, proyectos.fecha_inicio, (concat(usuarios.nombre , " " , usuarios.apellido)) as miembros, usuarios.id as idUsuario  FROM equipos INNER JOIN proyectos ON equipos.proyecto_id = proyectos.id INNER JOIN usuarios ON proyectos.id = usuarios.equipo_id WHERE equipos.id = ?', [req.params.id]);
+        const [rows] = await pool.query('SELECT equipos.id as idEquipo, equipos.nombre as equipoNombre, equipos.descripcion as equipoDescripcion, proyectos.id AS ProyectoId, proyectos.nombre as proyectoNombre, proyectos.fecha_inicio, (concat(usuarios.nombre , " " , usuarios.apellido)) as miembros, usuarios.id as idUsuario FROM equipos LEFT JOIN proyectos ON equipos.proyecto_id = proyectos.id LEFT JOIN usuarios ON equipos.id = usuarios.equipo_id WHERE equipos.id = ?;', [req.params.id]);
         if (rows.length <= 0) return res.status(404).json({
             message: 'Equipo no encontrado'
         })

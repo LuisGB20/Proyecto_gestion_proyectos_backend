@@ -12,6 +12,8 @@ import comentariosRoutes from './routes/comentarios.routes.js';
 import recursosRoutes from './routes/recursos.routes.js';
 import solicitudesRoutes from './routes/solicitudes.routes.js';
 import tareasRoutes from './routes/tareas.routes.js';
+import informacionDashRoutes from './routes/informacionDash.routes.js';
+import categoriasRecursosRoutes from './routes/categoriasRecursos.routes.js';
 
 const app = express();
 
@@ -28,6 +30,8 @@ app.use(comentariosRoutes);
 app.use(recursosRoutes);
 app.use(solicitudesRoutes);
 app.use(tareasRoutes);
+app.use(informacionDashRoutes);
+app.use(categoriasRecursosRoutes);
 
 const opcionesHTTPS = {
     key: fs.readFileSync('C:/Windows/System32/cert.key'),
